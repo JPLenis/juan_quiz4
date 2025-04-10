@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  name: 'Default'  # 
+  name: 'Default'  # self-hosted agent
 
 steps:
 - task: UseDotNet@2
@@ -12,16 +12,9 @@ steps:
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
 - script: |
-    for /r %%f in (*.csproj) do (
-      echo %%f > projectpath.txt
-      goto done
-    )
-    :done
-    set /p projpath=<projectpath.txt
-    echo Found project: %projpath%
-    call dotnet restore "%projpath%"
-    call dotnet build "%projpath%" --configuration Release
-    call dotnet publish "%projpath%" -c Release -o "$(Build.ArtifactStagingDirectory)\published"
+    dotnet restore juan_quiz4.csproj
+    dotnet build juan_quiz4.csproj --configuration Release
+    dotnet publish juan_quiz4.csproj -c Release -o $(Build.ArtifactStagingDirectory)/published
   displayName: 'Restore, Build & Publish'
   workingDirectory: '$(Build.SourcesDirectory)'
 
