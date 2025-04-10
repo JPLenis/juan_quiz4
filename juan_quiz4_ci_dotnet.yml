@@ -3,7 +3,6 @@ trigger:
 
 pool:
   name: 'Default'  
-
 steps:
 - task: UseDotNet@2
   inputs:
@@ -11,37 +10,20 @@ steps:
     version: '8.0.408'
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
-# Restore Step
 - script: |
-    FOR /R %%f IN (*.csproj) DO (
-      ECHO Restoring: %%f
-      dotnet restore "%%f"
-      EXIT /B 0
+    for /r %%f in (*.csproj) do (
+      echo Using project file: %%f
+      set "projectPath=%%f"
+      goto done
     )
-  displayName: 'Restore packages'
+    :done
+    echo Restoring %%projectPath%%
+    call dotnet restore "%%projectPath%%"
+    call dotnet build "%%projectPath%%" --configuration Release
+    call dotnet publish "%%projectPath%%" -c Release -o "$(Build.ArtifactStagingDirectory)\published"
+  displayName: 'Restore, Build & Publish'
   workingDirectory: '$(Build.SourcesDirectory)'
 
-# Build Step
-- script: |
-    FOR /R %%f IN (*.csproj) DO (
-      ECHO Building: %%f
-      dotnet build "%%f" --configuration Release
-      EXIT /B 0
-    )
-  displayName: 'Build'
-  workingDirectory: '$(Build.SourcesDirectory)'
-
-# Publish Step
-- script: |
-    FOR /R %%f IN (*.csproj) DO (
-      ECHO Publishing: %%f
-      dotnet publish "%%f" -c Release -o "$(Build.ArtifactStagingDirectory)/published"
-      EXIT /B 0
-    )
-  displayName: 'Publish'
-  workingDirectory: '$(Build.SourcesDirectory)'
-
-# Upload Artifact
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)/published'
