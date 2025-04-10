@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  name: 'Default'  
+  name: 'Default'  # self-hosted agent
 
 steps:
 - task: UseDotNet@2
@@ -11,20 +11,15 @@ steps:
     version: '8.0.408'
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
-- script: dotnet restore juan_quiz4.csproj
-  workingDirectory: '.'
-  displayName: 'Restore packages'
-
-- script: dotnet build juan_quiz4.csproj --configuration Release
-  workingDirectory: '.'
-  displayName: 'Build'
-
-- script: dotnet publish juan_quiz4.csproj -c Release -o $(Build.ArtifactStagingDirectory)
-  workingDirectory: '.'
-  displayName: 'Publish'
+- script: |
+    dotnet restore juan_quiz4.csproj
+    dotnet build juan_quiz4.csproj --configuration Release
+    dotnet publish juan_quiz4.csproj -c Release -o $(Build.ArtifactStagingDirectory)/published
+  displayName: 'Restore, Build & Publish'
+  workingDirectory: '$(Build.SourcesDirectory)'
 
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/published'
     ArtifactName: 'drop'
     publishLocation: 'Container'
