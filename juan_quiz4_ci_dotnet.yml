@@ -11,15 +11,15 @@ steps:
     version: '8.0.408'
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
-- script: dotnet restore
+- script: dotnet restore juan_quiz4.csproj
   workingDirectory: '.'
   displayName: 'Restore packages'
 
-- script: dotnet build --configuration Release
+- script: dotnet build juan_quiz4.csproj --configuration Release
   workingDirectory: '.'
   displayName: 'Build'
 
-- script: dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)
+- script: dotnet publish juan_quiz4.csproj -c Release -o $(Build.ArtifactStagingDirectory)
   workingDirectory: '.'
   displayName: 'Publish'
 
