@@ -4,6 +4,9 @@ trigger:
 pool:
   name: 'Default'  
 
+variables:
+  solutionPath: '$(Build.SourcesDirectory)/juan_quiz4.csproj'
+
 steps:
 - task: UseDotNet@2
   inputs:
@@ -11,16 +14,13 @@ steps:
     version: '8.0.408'
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
-- script: dotnet restore juan_quiz4.csproj
-  workingDirectory: '.'
+- script: dotnet restore "$(solutionPath)"
   displayName: 'Restore packages'
 
-- script: dotnet build juan_quiz4.csproj --configuration Release
-  workingDirectory: '.'
+- script: dotnet build "$(solutionPath)" --configuration Release
   displayName: 'Build'
 
-- script: dotnet publish juan_quiz4.csproj -c Release -o $(Build.ArtifactStagingDirectory)
-  workingDirectory: '.'
+- script: dotnet publish "$(solutionPath)" -c Release -o $(Build.ArtifactStagingDirectory)
   displayName: 'Publish'
 
 - task: PublishBuildArtifacts@1
