@@ -2,7 +2,8 @@ trigger:
 - main
 
 pool:
-  name: 'Default'  
+  name: 'Default'  # 
+
 steps:
 - task: UseDotNet@2
   inputs:
@@ -12,15 +13,15 @@ steps:
 
 - script: |
     for /r %%f in (*.csproj) do (
-      echo Using project file: %%f
-      set "projectPath=%%f"
+      echo %%f > projectpath.txt
       goto done
     )
     :done
-    echo Restoring %%projectPath%%
-    call dotnet restore "%%projectPath%%"
-    call dotnet build "%%projectPath%%" --configuration Release
-    call dotnet publish "%%projectPath%%" -c Release -o "$(Build.ArtifactStagingDirectory)\published"
+    set /p projpath=<projectpath.txt
+    echo Found project: %projpath%
+    call dotnet restore "%projpath%"
+    call dotnet build "%projpath%" --configuration Release
+    call dotnet publish "%projpath%" -c Release -o "$(Build.ArtifactStagingDirectory)\published"
   displayName: 'Restore, Build & Publish'
   workingDirectory: '$(Build.SourcesDirectory)'
 
