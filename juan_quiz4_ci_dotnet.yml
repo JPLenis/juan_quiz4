@@ -8,19 +8,19 @@ steps:
 - task: UseDotNet@2
   inputs:
     packageType: 'sdk'
-    version: '8.0.408'  # or '8.0.x'
+    version: '8.0.408' 
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
 - script: dotnet restore
-  workingDirectory: 'juan_quiz4'  # 
+  workingDirectory: '.'
   displayName: 'Restore packages'
 
 - script: dotnet build --configuration Release
-  workingDirectory: 'juan_quiz4'  
+  workingDirectory: '.'
   displayName: 'Build'
 
 - script: dotnet publish -c Release -o $(Build.ArtifactStagingDirectory)
-  workingDirectory: 'juan_quiz4'  
+  workingDirectory: '.'
   displayName: 'Publish'
 
 - task: PublishBuildArtifacts@1
