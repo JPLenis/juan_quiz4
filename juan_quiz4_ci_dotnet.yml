@@ -2,10 +2,7 @@ trigger:
 - main
 
 pool:
-  name: 'Default'  
-
-variables:
-  solutionPath: '$(Build.SourcesDirectory)/juan_quiz4.csproj'
+  name: 'Default'  # your self-hosted agent pool
 
 steps:
 - task: UseDotNet@2
@@ -14,14 +11,32 @@ steps:
     version: '8.0.408'
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
-- script: dotnet restore "$(solutionPath)"
+- script: |
+    FOR /R %%f IN (*.csproj) DO (
+      ECHO Found project file: %%f
+      dotnet restore "%%f"
+      EXIT /B 0
+    )
   displayName: 'Restore packages'
+  workingDirectory: '$(Build.SourcesDirectory)'
 
-- script: dotnet build "$(solutionPath)" --configuration Release
+- script: |
+    FOR /R %%f IN (*.csproj) DO (
+      ECHO Building: %%f
+      dotnet build "%%f" --configuration Release
+      EXIT /B 0
+    )
   displayName: 'Build'
+  workingDirectory: '$(Build.SourcesDirectory)'
 
-- script: dotnet publish "$(solutionPath)" -c Release -o $(Build.ArtifactStagingDirectory)
+- script: |
+    FOR /R %%f IN (*.csproj) DO (
+      ECHO Publishing: %%f
+      dotnet publish "%%f" -c Release -o $(Build.ArtifactStagingDirectory)
+      EXIT /B 0
+    )
   displayName: 'Publish'
+  workingDirectory: '$(Build.SourcesDirectory)'
 
 - task: PublishBuildArtifacts@1
   inputs:
