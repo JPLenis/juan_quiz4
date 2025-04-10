@@ -2,7 +2,7 @@ trigger:
 - main
 
 pool:
-  name: 'Default'  # your self-hosted agent pool
+  name: 'Default'  
 
 steps:
 - task: UseDotNet@2
@@ -11,15 +11,17 @@ steps:
     version: '8.0.408'
     installationPath: $(Agent.ToolsDirectory)/dotnet
 
+# Restore Step
 - script: |
     FOR /R %%f IN (*.csproj) DO (
-      ECHO Found project file: %%f
+      ECHO Restoring: %%f
       dotnet restore "%%f"
       EXIT /B 0
     )
   displayName: 'Restore packages'
   workingDirectory: '$(Build.SourcesDirectory)'
 
+# Build Step
 - script: |
     FOR /R %%f IN (*.csproj) DO (
       ECHO Building: %%f
@@ -29,17 +31,19 @@ steps:
   displayName: 'Build'
   workingDirectory: '$(Build.SourcesDirectory)'
 
+# Publish Step
 - script: |
     FOR /R %%f IN (*.csproj) DO (
       ECHO Publishing: %%f
-      dotnet publish "%%f" -c Release -o $(Build.ArtifactStagingDirectory)
+      dotnet publish "%%f" -c Release -o "$(Build.ArtifactStagingDirectory)/published"
       EXIT /B 0
     )
   displayName: 'Publish'
   workingDirectory: '$(Build.SourcesDirectory)'
 
+# Upload Artifact
 - task: PublishBuildArtifacts@1
   inputs:
-    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)/published'
     ArtifactName: 'drop'
     publishLocation: 'Container'
